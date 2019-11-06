@@ -177,14 +177,12 @@ def chase_direct():
     global kpos
     if uk_dist() <= -3: arr_temp = [-2, -2, -2]
     else: arr_temp = [2, 2, 2]
-    print("Direct chase array : ", arr_temp)
     return arr_temp
         
 def chase():
     global upos, kpos
     global f_lt_dir
     global u_stay, u_run
-    print("Chase distance :", uk_dist())
 
     if f_lt_dir == 0:
         if random.random() < 0.5: arr_temp = [-2, -2, -2]
@@ -274,13 +272,11 @@ def user_moves():
     arr_umoves = request.json["umoves"]
     upos = request.json["uposition"]
     kpos = request.json["kposition"]
-    print("Front-end - User moves:", arr_umoves, "pos:", upos, "Knife:", kpos)
 
     user_pos(arr_umoves)
     arr_kmoves = chase()
     knife_position = pos_knife(arr_kmoves)
     movesid = post_Moves(arr_umoves, arr_kmoves)
-    print("Knife moves array : ", arr_kmoves, "  Knife position -> ", knife_position)
     return str(knife_position)
 
 

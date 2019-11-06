@@ -1173,7 +1173,6 @@ const Board = () => {
           }
         }
         setShowKnife(false);
-        console.log("New position:", position);
       }
     }
   };
@@ -1234,7 +1233,7 @@ const Board = () => {
       }
     }
     axios
-      .post("http://localhost:5000/moves", {
+      .post("https://knife-chase-game.herokuapp.com/moves", {
         umoves: userMoves,
         uposition: user_position,
         kposition: posKnife
@@ -1248,12 +1247,9 @@ const Board = () => {
         setPosKnife(kpos);
       });
     setUserMoves([0, 0, 0]);
-    console.log("Call Game end knife position", posKnife, position);
-    game_end();
   };
 
   const game_end = () => {
-    console.log("Game end knife position", posKnife, position);
     if (position === posKnife) {
       setShowKnife(true);
       setShowArrow([0, 0, 0, 0]);

@@ -11,7 +11,7 @@ class PlayerForm extends React.Component {
   }
   myChangeHandler = event => {
     axios
-      .post("http://localhost:5000/player", {
+      .post("https://knife-chase-game.herokuapp.com/player", {
         name: this.state.username,
         score: 0
       })
