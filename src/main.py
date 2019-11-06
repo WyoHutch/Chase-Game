@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
 from flask_heroku import Heroku
+from datetime import datetime
 import os
 import random
 
@@ -16,34 +17,124 @@ ma = Marshmallow(app)
 
 CORS(app)
 
+initPlayers = [
+    { "name": "Adam", "datetime": datetime.now(), "gameid": 1, "score": 20 },
+    { "name": "Bart", "datetime": datetime.now(), "gameid": 2, "score": 30 },
+    { "name": "Carl", "datetime": datetime.now(), "gameid": 3, "score": 40 },
+    { "name": "Adam", "datetime": datetime.now(), "gameid": 4, "score": 50 },
+    { "name": "Adam", "datetime": datetime.now(), "gameid": 5, "score": 25 },
+    { "name": "Bart", "datetime": datetime.now(), "gameid": 6, "score": 36 },
+    { "name": "Carl", "datetime": datetime.now(), "gameid": 7, "score": 47 },
+    { "name": "Adam", "datetime": datetime.now(), "gameid": 8, "score": 52 }
+]
+
+initMoves = [
+    { "gameid": 1, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 },
+    { "gameid": 1, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 },
+    { "gameid": 2, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 },
+    { "gameid": 2, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 },
+    { "gameid": 3, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 },
+    { "gameid": 4, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 },
+    { "gameid": 4, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 },
+    { "gameid": 5, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 },
+    { "gameid": 5, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 },
+    { "gameid": 6, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 },
+    { "gameid": 6, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 },
+    { "gameid": 7, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 },
+    { "gameid": 8, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 },
+    { "gameid": 8, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 },
+    { "gameid": 8, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 },
+    { "gameid": 8, "umove1": 0, "umove2": -1, "umove3": 1, "kmove1": 2, "kmove2": 2, "kmove3": 2 }
+]
+
 class Player(db.Model):
     __tablename__ = "players"
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(20), unique = False)
     datetime = db.Column(db.DateTime, unique = False)
+    gameid = db.Column(db.Integer, unique = True)
     score = db.Column(db.Integer, unique = False)
 
-    def __init__(self, name, datetime, score):
+    def __init__(self, name, datetime, gameid, score):
         self.name = name
         self.datetime = datetime
+        self.gameid = gameid
         self.score = score
 
 class PlayerSchema(ma.Schema):
     class Meta:
-        fields = ("id", "name", "datetime", "score")
+        fields = ("id", "name", "datetime", "gameid" "score")
 
-single_jschema = PlayerSchema()
-plural_jschema = PlayerSchema(many = True)
+single_pschema = PlayerSchema()
+plural_pschema = PlayerSchema(many = True)
 
-@app.route('/players', methods=['GET'])
+class Moves(db.Model):
+    __tablename__ = "moves"
+    id = db.Column(db.Integer, primary_key = True)
+    gameid = db.Column(db.Integer, unique = False)
+    umove1 = db.Column(db.Integer, unique = False)
+    umove2 = db.Column(db.Integer, unique = False)
+    umove3 = db.Column(db.Integer, unique = False)
+    kmove1 = db.Column(db.Integer, unique = False)
+    kmove2 = db.Column(db.Integer, unique = False)
+    kmove3 = db.Column(db.Integer, unique = False)
+
+    def __init__(self, gameid, umove1, umove2, umove3, kmove1, kmove2, kmove3):
+        self.gameid = gameid
+        self.umove1 = umove1
+        self.umove2 = umove2
+        self.umove3 = umove3
+        self.kmove1 = kmove1
+        self.kmove2 = kmove2
+        self.kmove3 = kmove3
+
+class MoveSchema(ma.Schema):
+    class Meta:
+        fields = ("id", "gameid", "umove1", "umove2", "umove3", "kmove1", "kmove2", "kmove3",  )
+
+single_mschema = MoveSchema()
+plural_mschema = MoveSchema(many = True)
+
+@app.route('/player', methods=['POST'])
+def post_Player():
+    gameid = get_Players() + 1
+    name = request.json["name"]
+    datetime = now()
+    score = request.json["score"]
+    new_player = Player(name, datetime, gameid, score)
+
+    db.session.add(new_player)
+    db.session.commit()
+    return gameid
+
 def get_Players():
     all_players = Player.query.all()
-    return jsonify(plural_jschema.dump(all_players))
+    new_gameid = 0
+    for players in all_players:
+        if players.gameid > new_gameid: new_gameid = players.gameid
+    return new_gameid
 
-@app.route('/getMoves/<id>', methods=['GET'])
-def return_moves(id):
-    student = Student.query.get(id)
-    return jsonify(single_jschema.dump(student))
+gameid = 0
+def post_Moves(umoves, arr_kmoves):
+    global gameid
+    umove1 = umoves[0]
+    umove2 = umoves[1]
+    umove3 = umoves[2]
+    kmove1 = arr_kmoves[0]
+    kmove2 = arr_kmoves[1]
+    kmove3 = arr_kmoves[2]
+    new_moves = Moves(gameid, umove1, umove2, umove3, kmove1, kmove2, kmove3)
+
+    db.session.add(new_moves)
+    db.session.commit()
+    retstr = single_mschema.jsonify(Moves.query.get(new_moves.id))
+    return retstr.json["id"]
+
+
+# @app.route('/getMoves/<id>', methods=['GET'])
+# def return_moves(id):
+#     student = Student.query.get(id)
+#     return jsonify(single_jschema.dump(student))
 
 kpos = 0
 upos = 8
@@ -188,8 +279,10 @@ def user_moves():
     user_pos(arr_umoves)
     arr_kmoves = chase()
     knife_position = pos_knife(arr_kmoves)
+    movesid = post_Moves(arr_umoves, arr_kmoves)
     print("Knife moves array : ", arr_kmoves, "  Knife position -> ", knife_position)
     return str(knife_position)
+
 
 if __name__ == '__main__':
     app.run(debug = True)
