@@ -6,26 +6,40 @@ class PlayerForm extends React.Component {
     super(props);
     this.state = {
       username: "",
-      gameid: 0
+      hi_score: 0
     };
+
+    this.myChangeHandler = this.myChangeHandler.bind(this);
+    this.postPlayer = this.postPlayer.bind(this);
   }
-  myChangeHandler = event => {
+  myChangeHandler(event) {
+    this.setState({ username: event.target.value });
+  }
+
+  postPlayer = event => {
+    event.preventDefault();
     axios
       .post("https://knife-chase-game.herokuapp.com/player", {
-        name: this.state.username,
-        score: 0
+        // .post("http://localhost:5000/player", {
+        name: this.state.username
       })
       .then(response => {
-        this.setState({ gameid: Number(response.data) });
+        console.log("Player response:r", response);
+        this.setState({ hi_score: Number(response.data) });
       });
   };
+
   render() {
     return (
-      <form>
-        <p>Enter Player Name:</p>
-        <input type="text" name="username" />
-        <button onClick={this.myChangeHandler}>Submit</button>
-        {this.state.errormessage}
+      <form onSubmit={this.postPlayer}>
+        <h3 style={{ color: "cyan" }}>High Score : {this.state.hi_score}</h3>
+        <p style={{ textAlign: "left" }}>Enter Player Name: </p>
+        <input
+          type="text"
+          value={this.state.username}
+          onChange={this.myChangeHandler}
+        />
+        <input type="submit" value="Submit" />
       </form>
     );
   }

@@ -19,7 +19,7 @@ const Board = () => {
   var tmpsqrs = [9, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0];
   const [squares, setSquares] = useState(tmpsqrs);
   const [showArrow, setShowArrow] = useState([1, 0, 0, 1]);
-  const [gameMess, setGameMess] = useState("Good Luck");
+  const [gameMess, setGameMess] = useState("Start Game");
   var colBG = "#707070";
   var colYel0 = "#d0d000";
   var colYel1 = "#c0c000";
@@ -1150,6 +1150,8 @@ const Board = () => {
   };
 
   const squareMod = dir => {
+    let umov = moveNum + 1;
+    setGameMess("Move# " + umov);
     userMoves[moveNum] = dir;
     setUserMoves([...userMoves]);
     if (dir === -2 || dir === 2) {
@@ -1212,9 +1214,10 @@ const Board = () => {
   };
 
   const knifeTurn = () => {
+    setGameMess("Knife Moving");
     setShowKnife(false);
     staylook();
-    for (var j = 1; j <= 3; j++) {
+    for (var j = 1; j <= 4; j++) {
       (function(j) {
         setTimeout(function() {
           setKnifeTime(j);
@@ -1223,6 +1226,7 @@ const Board = () => {
     }
     setTimeout(function() {
       setMoveNum(0);
+      setGameMess("Your Turn");
     }, 2200);
     let user_position = -1;
     for (let i = 0; i < 16; i++) {
@@ -1234,6 +1238,7 @@ const Board = () => {
     }
     axios
       .post("https://knife-chase-game.herokuapp.com/moves", {
+        // .post("http://localhost:5000/moves", {
         umoves: userMoves,
         uposition: user_position,
         kposition: posKnife
@@ -1247,13 +1252,24 @@ const Board = () => {
         setPosKnife(kpos);
       });
     setUserMoves([0, 0, 0]);
+    // setMoveNum(4);
   };
 
   const game_end = () => {
+    console.log("GameEnd knifetime:", knifeTime);
     if (position === posKnife) {
       setShowKnife(true);
       setShowArrow([0, 0, 0, 0]);
+      setMoveNum(3);
       setGameMess("Game Over");
+      axios
+        .put("https://knife-chase-game.herokuapp.com/putScore", {
+          // .put("http://localhost:5000/putScore", {
+          score: totMoves
+        })
+        .then(response => {
+          console.log("Game Over", response);
+        });
     }
   };
 
@@ -1414,45 +1430,55 @@ const Board = () => {
       </div>
       <div
         className="showButtons"
-        style={moveNum === 3 ? { visibility: "hidden" } : null}
+        style={moveNum === 3 ? { display: "none" } : null}
       >
-        {showArrow[0] === 1 ? (
-          <img
-            id="butUp"
-            src={up_arrow}
-            style={{ backgroundColor: upArrowBG }}
-            onClick={() => moveUp()}
-            alt="arrow"
-          />
-        ) : null}
-        {showArrow[1] === 1 ? (
-          <img
-            id="butRight"
-            src={right_arrow}
-            style={{ backgroundColor: rightArrowBG }}
-            onClick={() => moveRight()}
-            alt="arrow"
-          />
-        ) : null}
-        {showArrow[2] === 1 ? (
-          <img
-            id="butDown"
-            src={down_arrow}
-            style={{ backgroundColor: downArrowBG }}
-            onClick={() => moveDown()}
-            alt="arrow"
-          />
-        ) : null}
-        {showArrow[3] === 1 ? (
-          <img
-            id="butLeft"
-            src={left_arrow}
-            style={{ backgroundColor: leftArrowBG }}
-            onClick={() => moveLeft()}
-            alt="arrow"
-          />
-        ) : null}
-        <button id="butStay" onClick={() => moveStay()}></button>
+        <div id="butUpDiv">
+          {showArrow[0] === 1 ? (
+            <img
+              id="butUp"
+              src={up_arrow}
+              style={{ backgroundColor: upArrowBG }}
+              onClick={() => moveUp()}
+              alt="arrow"
+            />
+          ) : null}
+        </div>
+        <div id="butRightDiv">
+          {showArrow[1] === 1 ? (
+            <img
+              id="butRight"
+              src={right_arrow}
+              style={{ backgroundColor: rightArrowBG }}
+              onClick={() => moveRight()}
+              alt="arrow"
+            />
+          ) : null}
+        </div>
+        <div id="butDownDiv">
+          {showArrow[2] === 1 ? (
+            <img
+              id="butDown"
+              src={down_arrow}
+              style={{ backgroundColor: downArrowBG }}
+              onClick={() => moveDown()}
+              alt="arrow"
+            />
+          ) : null}
+        </div>
+        <div id="butLeftDiv">
+          {showArrow[3] === 1 ? (
+            <img
+              id="butLeft"
+              src={left_arrow}
+              style={{ backgroundColor: leftArrowBG }}
+              onClick={() => moveLeft()}
+              alt="arrow"
+            />
+          ) : null}
+        </div>
+        <button id="butStay" onClick={() => moveStay()}>
+          S
+        </button>
       </div>
     </div>
   );
